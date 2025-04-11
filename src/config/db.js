@@ -1,21 +1,21 @@
 const { Sequelize } = require('sequelize');
 const config = require('./config.json').development;
 
-// Tạo kết nối Sequelize với cấu hình từ `config.json`
 const sequelize = new Sequelize(config.database, config.username, config.password, {
   host: config.host,
   dialect: config.dialect,
-  dialectOptions: {
-    connectTimeout: 60000 // Tăng timeout để tránh lỗi kết nối chậm
-  },
+  port: config.port,
+  dialectOptions: config.dialectOptions,
   pool: {
-    max: 10, // Giới hạn số kết nối tối đa
+    max: 10,
     min: 0,
-    acquire: 30000, // Thời gian tối đa để lấy kết nối
-    idle: 10000 // Thời gian chờ trước khi giải phóng kết nối
+    acquire: 30000,
+    idle: 10000
   },
-  logging: false // Tắt log SQL (nếu cần debug thì đổi thành `console.log`)
+  logging: false
 });
+
+
 
 // Kiểm tra kết nối
 async function testConnection() {
