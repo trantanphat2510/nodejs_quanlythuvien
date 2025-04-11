@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books Management - Library Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <%- include("sideBar") %>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Header -->
+                <!-- <%- include("header") %> -->
+
+                <!-- Content Area -->
+                <div class="content">
+                    <div class="page-header">
+                        <h1>Books Management</h1>
+                        <p>Manage your library's book collection</p>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="action-bar">
+                        <div class="action-bar-left">
+                            <div class="search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="search" placeholder="Search books by title, author, ISBN...">
+                            </div>
+                        </div>
+                        <div class="action-bar-right">
+                            <div class="dropdown">
+                                <button class="btn btn-outline dropdown-toggle">
+                                    <i class="fas fa-filter"></i>
+                                    <span>Filter</span>
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a href="#">All Books</a>
+                                    <a href="#">Available</a>
+                                    <a href="#">Borrowed</a>
+                                    <a href="#">Recently Added</a>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-download"></i>
+                                <span>Export</span>
+                            </button>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                <a href="/dashboard/book/add">Add Book</a>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Books Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Book Collection</h2>
+                            <p>Manage and view all books in your library</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Author</th>
+                                            <th>Image</th>
+                                            <th>Category</th>
+                                            <th>Stock</th>
+                                            <th>Released Year</th>
+                                            <th class="text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="book-table">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+    </div>
+
+    <script src="/js/admin.js"></script>
+    <script>
+        let bookList = [];
+
+        const renderBook = () => {
+            fetch("/api/book", {
+                method: "GET",
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        alert(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(books => {
+                    bookList = books; // Lưu danh sách sách vào biến
+                    displayBooks(books);
+                })
+                .catch(error => console.error("Error fetching books:", error));
+        };
+
+        const displayBooks = (books) => {
+            const tableBody = document.getElementById("book-table");
+            tableBody.innerHTML = "";
+
+            books.forEach(book => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                <td class="font-medium">${book.Title}</td>
+                <td>${book.Author}</td>
+                <td>
+                    <img src="/${book.Image}" alt="Book Cover" style="width: 50px; height: auto; border-radius: 5px;">
+                </td>
+                <td>${book.Categories && book.Categories.length > 0
+                        ? book.Categories.map(c => c.CategoryName).join(", ")
+                        : "Unknown"}
+                </td>
+                <td>
+                    <span class="badge ${book.Stock > 0 ? 'badge-success' : 'badge-danger'}">
+                        ${book.Stock > 0 ? book.Stock : 'Hết hàng'}
+                    </span>
+                </td>
+                <td>${book.Year}</td>
+                <td class="text-right">
+                    <a target="__blank" href="/books/${book.BookId}">View Details</a> <br/>
+                    <a href="/dashboard/book/edit/${book.BookId}">Edit Book</a> <br/>
+                    <a href="#" class="text-danger delete-book" data-id="${book.BookId}">Delete Book</a>
+                </td>
+            `;
+
+                tableBody.appendChild(row);
+            });
+        };
+
+        const filterBooks = (searchTerm) => {
+            const filteredBooks = bookList.filter(book =>
+                book.Title.toLowerCase().includes(searchTerm) ||
+                book.Author.toLowerCase().includes(searchTerm) ||
+                (book.ISBN && book.ISBN.toLowerCase().includes(searchTerm))
+            );
+            displayBooks(filteredBooks);
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderBook();
+
+            document.querySelector(".search-container input").addEventListener("input", (event) => {
+                const searchTerm = event.target.value.toLowerCase();
+                filterBooks(searchTerm);
+            });
+
+            document.addEventListener("click", async (event) => {
+                if (event.target.classList.contains("delete-book")) {
+                    event.preventDefault();
+
+                    const bookId = event.target.getAttribute("data-id");
+                    if (!bookId) return;
+
+                    const confirmDelete = confirm("Bạn có chắc muốn xóa sách này?");
+                    if (!confirmDelete) return;
+
+                    try {
+                        const response = await fetch(`/api/book/${bookId}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": `Bearer ${localStorage.getItem("token")}`
+                            }
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            event.target.closest("tr").remove();
+                        } else {
+                            alert(`Lỗi: ${result.error || "Có lỗi xảy ra!"}`);
+                        }
+                    } catch (error) {
+                        alert("Lỗi kết nối đến server!");
+                        console.error("Delete Error:", error);
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

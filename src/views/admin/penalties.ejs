@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penalties - Library Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        .modal {
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 16px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #penaltyForm input,
+        #penaltyForm textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 6px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #penaltyForm button {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #penaltyForm button:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <%- include("sideBar") %>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Header -->
+                <!-- <%- include("header") %> -->
+
+                <!-- Content Area -->
+                <div class="content">
+                    <div class="page-header">
+                        <h1>Penalties Management</h1>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="action-bar">
+                        <div class="action-bar-left">
+                            <div class="search-container">
+                                <label class="switch">
+                                    <input type="checkbox" id="outdated-record">
+                                    <span class="slider round"></span>
+                                </label>
+                                <span style="font-size: 16px;">Lọc đơn quá hạn trả</span>
+                            </div>
+                        </div>
+                        <div class="action-bar-left">
+                            <div class="search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="search" placeholder="Search members by name, email, ID...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="penaltyModal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <span class="close" onclick="closeModal()">&times;</span>
+                            <h2>Tạo Phiếu Phạt</h2>
+                            <form id="penaltyForm">
+                                <input type="hidden" id="borrowRecordId">
+                                <input type="hidden" id="userId">
+
+                                <label for="amount">Số tiền (₫):</label>
+                                <input type="number" id="amount" required>
+
+                                <label for="reason">Lý do:</label>
+                                <textarea id="reason" rows="3" required></textarea>
+
+                                <button type="submit">Xác nhận tạo</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Borrowing Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Các đơn hàng đang mượn</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Borrow Date</th>
+                                            <th>Return Date</th>
+                                            <th>Status</th>
+                                            <th>Total Price</th>
+                                            <th>User</th>
+                                            <th class="text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="records">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Các đơn phạt</h2>
+                        </div>
+                        <div class="card-content">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Amount</th>
+                                            <th>Reason</th>
+                                            <th>Status</th>
+                                            <th>User</th>
+                                            <th class="text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="penalties">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+    </div>
+
+    <script>
+        let allPenalties = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fetch penalties
+            fetch('/api/penalty')
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    allPenalties = data;
+                    renderPenalties(allPenalties);
+                })
+                .catch(error => {
+                    console.error('Error fetching penalties:', error);
+                });
+        });
+
+        function renderPenalties(penalties) {
+            const tbody = document.getElementById('penalties');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            penalties.forEach(penalty => {
+                const user = penalty.User || {};
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+            <td>${penalty.PenaltyId}</td>
+            <td>${penalty.Amount.toLocaleString()}₫</td>
+            <td>${penalty.Reason}</td>
+            <td><span class="badge badge-${getBadgeClass(penalty.Status)}">${penalty.Status}</span></td>
+            <td>
+                <div class="member-info">
+                    <span class="font-medium">${user.Username || 'Unknown'}</span><br>
+                </div>
+            </td>
+            <td class="text-right">
+                ${penalty.Status !== 'DONE' ? `<button class="btn btn-primary" onclick="markAsPaid(${penalty.PenaltyId})">Đánh dấu đã trả</button>` : ''}
+            </td>
+        `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+
+        // Sử dụng lại badge class
+        function getBadgeClass(status) {
+            switch (status) {
+                case 'PENDING': return 'warning';
+                case 'BORROWING': return 'info';
+                case 'DONE': return 'success';
+                default: return 'secondary';
+            }
+        }
+        let allRecords = [];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/borrowrecords')
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    allRecords = data;
+                    renderAllRecords(allRecords);
+                })
+                .catch(error => {
+                    console.error('Error fetching records:', error);
+                });
+
+            document.getElementById('outdated-record').addEventListener('change', function () {
+                filterAndRender();
+            });
+
+            document.querySelector('input[type="search"]').addEventListener('input', function () {
+                filterAndRender();
+            });
+        });
+
+        function filterAndRender() {
+            const showOutdated = document.getElementById('outdated-record').checked;
+            const searchKeyword = document.querySelector('input[type="search"]').value.trim().toLowerCase();
+            const today = new Date();
+
+            const filtered = allRecords.filter(record => {
+                const isOverdue = showOutdated ? new Date(record.ReturnDate) < today && record.Status === 'BORROWING' : true;
+                const matchSearch = record.User?.Username?.toLowerCase().includes(searchKeyword) ||
+                    record.User?.Email?.toLowerCase().includes(searchKeyword) ||
+                    record.RecordId.toString().includes(searchKeyword);
+                return isOverdue && matchSearch;
+            });
+
+            renderAllRecords(filtered);
+        }
+
+        function renderAllRecords(records) {
+            const tbody = document.getElementById('records');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            records.forEach(record => {
+                const totalPrice = record.RecordDetails.reduce((sum, detail) => sum + detail.Price, 0);
+                const user = record.User || {};
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${record.RecordId}</td>
+                    <td>${new Date(record.BorrowDate).toLocaleDateString()}</td>
+                    <td>${new Date(record.ReturnDate).toLocaleDateString()}</td>
+                    <td><span class="badge badge-${getBadgeClass(record.Status)}">${record.Status}</span></td>
+                    <td>${totalPrice.toLocaleString()}₫</td>
+                    <td>
+                        <div class="member-info">
+                            <span class="font-medium">${user.Username || 'Unknown'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary" onclick="openPenaltyModal(${record.RecordId}, ${record.User?.UserId || 0})">Tạo phiếu phạt</button>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function getBadgeClass(status) {
+            switch (status) {
+                case 'PENDING': return 'warning';
+                case 'BORROWING': return 'info';
+                case 'DONE': return 'success';
+                default: return 'secondary';
+            }
+        }
+
+        function openPenaltyModal(borrowRecordId, userId) {
+            document.getElementById('borrowRecordId').value = borrowRecordId;
+            document.getElementById('userId').value = userId;
+            document.getElementById('penaltyModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('penaltyModal').style.display = 'none';
+            document.getElementById('penaltyForm').reset();
+        }
+
+        document.getElementById('penaltyForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const payload = {
+                Amount: parseFloat(document.getElementById('amount').value),
+                Reason: document.getElementById('reason').value,
+                UserId: parseInt(document.getElementById('userId').value),
+                BorrowRecordId: parseInt(document.getElementById('borrowRecordId').value)
+            };
+
+            fetch('/api/penalty', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert('Tạo phiếu phạt thành công!');
+                    closeModal();
+                    window.location.reload();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Có lỗi xảy ra khi tạo phiếu phạt.');
+                });
+        });
+
+        function markAsPaid(penaltyId) {
+            if (!confirm("Xác nhận rằng người dùng đã nộp phạt?")) return;
+
+            fetch(`/api/penalty/${penaltyId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ Status: "DONE" })
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to update penalty status");
+                    return res.json();
+                })
+                .then(() => {
+                    alert('Đã cập nhật trạng thái phiếu phạt!');
+                    // Reload penalties
+                    return fetch('/api/penalty');
+                })
+                .then(res => res.json())
+                .then(data => {
+                    allPenalties = data;
+                    renderPenalties(allPenalties);
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Có lỗi khi cập nhật trạng thái phiếu phạt.');
+                });
+        }
+
+    </script>
+    <script src="/js/admin.js"></script>
+</body>
+
+</html>

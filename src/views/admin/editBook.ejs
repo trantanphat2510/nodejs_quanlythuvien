@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Book - Library Management</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Additional styles for the add book form */
+        .form-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #4361ee;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-control.invalid {
+            border-color: #e63946;
+        }
+
+        .error-message {
+            color: #e63946;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        .file-upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: #4361ee;
+            background-color: #f0f4ff;
+        }
+
+        .file-upload input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload i {
+            font-size: 24px;
+            color: #4361ee;
+            margin-bottom: 10px;
+        }
+
+        .file-upload p {
+            margin: 0;
+            color: #666;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+            word-break: break-all;
+            max-width: 100%;
+            display: none;
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #4361ee;
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px #4361ee;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .status-text {
+            font-size: 14px;
+        }
+
+        .category-list {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .category-item input {
+            margin-right: 8px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: #4361ee;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #3a56d4;
+        }
+
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .btn-secondary:hover {
+            background-color: #dde2e6;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 150px;
+            margin-top: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <%- include("sideBar") %>
+            <main class="main-content">
+                <%- include("header") %>
+                    <div class="content">
+                        <div class="page-header">
+                            <h1>Edit Book</h1>
+                            <p>Update book details in your library collection.</p>
+                        </div>
+                        <div class="form-container">
+                            <form id="editBookForm" enctype="multipart/form-data">
+                                <div class="form-grid">
+                                    <input type="hidden" name="bookId" id="bookId" />
+                                    <!-- Book Cover Image -->
+                                    <div class="form-group">
+                                        <label for="image">Book Cover Image</label>
+                                        <div class="file-upload" id="imageUpload">
+                                            <input type="file" id="image" name="image" accept="image/*">
+                                            <i class="fas fa-image"></i>
+                                            <p>Click or drag to upload image</p>
+                                        </div>
+                                        <div class="file-name" id="imageFileName"></div>
+                                        <img id="imagePreview" class="preview-image" src="/placeholder.svg"
+                                            alt="Image preview">
+                                        <div class="error-message" id="imageError">Please select a valid image file.
+                                        </div>
+                                    </div>
+
+                                    <!-- Book PDF File -->
+                                    <div class="form-group">
+                                        <label for="file">Book PDF File</label>
+                                        <div class="file-upload" id="pdfUpload">
+                                            <input type="file" id="file" name="file" accept="application/pdf">
+                                            <i class="fas fa-file-pdf"></i>
+                                            <p>Click or drag to upload PDF</p>
+                                        </div>
+                                        <div class="file-name" id="pdfFileName"></div>
+                                        <div class="error-message" id="fileError">Please select a valid PDF file.</div>
+                                    </div>
+
+                                    <!-- Book Title -->
+                                    <div class="form-group">
+                                        <label for="title">Book Title *</label>
+                                        <input type="text" id="title" name="title" class="form-control" required>
+                                        <div class="error-message" id="titleError">Title is required.</div>
+                                    </div>
+
+                                    <!-- Author -->
+                                    <div class="form-group">
+                                        <label for="author">Author *</label>
+                                        <input type="text" id="author" name="author" class="form-control" required>
+                                        <div class="error-message" id="authorError">Author is required.</div>
+                                    </div>
+
+                                    <!-- Publisher -->
+                                    <div class="form-group">
+                                        <label for="publisher">Publisher *</label>
+                                        <input type="text" id="publisher" name="publisher" class="form-control"
+                                            required>
+                                        <div class="error-message" id="publisherError">Publisher is required.</div>
+                                    </div>
+
+                                    <!-- Publication Year -->
+                                    <div class="form-group">
+                                        <label for="year">Publication Year *</label>
+                                        <input type="number" id="year" name="year" class="form-control" required>
+                                        <div class="error-message" id="yearError">Year must be positive and not greater
+                                            than current year.</div>
+                                    </div>
+
+                                    <!-- Price -->
+                                    <div class="form-group">
+                                        <label for="price">Price *</label>
+                                        <input type="number" id="price" name="price" class="form-control" step="0.01"
+                                            required>
+                                        <div class="error-message" id="priceError">Price must be a positive number.
+                                        </div>
+                                    </div>
+
+                                    <!-- Stock -->
+                                    <div class="form-group">
+                                        <label for="stock">Stock *</label>
+                                        <input type="number" id="stock" name="stock" class="form-control" required>
+                                        <div class="error-message" id="stockError">Stock must be greater than 0.</div>
+                                    </div>
+
+                                    <!-- Status -->
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        <div class="switch-container">
+                                            <label class="switch">
+                                                <input type="checkbox" id="status" name="status" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                            <span class="status-text" id="statusText">Available</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Categories -->
+                                    <div class="form-group full-width">
+                                        <label>Categories *</label>
+                                        <div class="category-list" id="categoryList">
+                                            <!-- Categories would be dynamically loaded here -->
+
+
+                                        </div>
+                                        <div class="error-message" id="categoryError">Please select at least one
+                                            category.</div>
+                                    </div>
+                                </div>
+
+                                <div class="btn-container">
+                                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                                    <button type="submit" class="btn btn-primary" id="submitBtn">Update Book</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+            </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const bookId = window.location.pathname.split('/').pop();
+            document.getElementById('bookId').value = bookId;
+
+            try {
+                let response = await fetch(`/api/book/${bookId}`);
+                if (!response.ok) return; //window.location.href = '/dashboard/book';
+                let book = await response.json();
+
+                console.log(book);
+                document.getElementById('title').value = book.Title;
+                document.getElementById('author').value = book.Author;
+                document.getElementById('publisher').value = book.Publisher;
+                document.getElementById('year').value = book.Year;
+                document.getElementById('price').value = book.Price;
+                document.getElementById('stock').value = book.Stock;
+                document.getElementById('status').checked = book.Status;
+
+                if (book.Image) document.getElementById('imagePreview').src = '/' + book.Image;
+                // if (book.File) document.getElementById('pdfFileName').textContent = book.File;
+
+                let categories = await fetch("/api/category").then(res => res.json());
+                let selectedCategoryIds = book.Categories.map(cat => cat.CategoryId);
+
+                document.getElementById('categoryList').innerHTML = categories.map(cat => `
+                    <div>
+                        <input type="checkbox" id="cat${cat.CategoryId}" name="categoryIds" value="${cat.CategoryId}" 
+                            ${selectedCategoryIds.includes(cat.CategoryId) ? 'checked' : ''}>
+                        <label for="cat${cat.CategoryId}">${cat.CategoryName}</label>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error(error);
+                //window.location.href = '/dashboard/book';
+            }
+
+            document.getElementById('editBookForm').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                let formData = new FormData(this);
+                formData.append("status", document.getElementById("status").checked ? 'true' : 'false');
+                let categories = [...document.querySelectorAll("input[name='categoryIds']:checked")].map(cb => cb.value);
+                categories.forEach(id => formData.append("categoryIds", id));
+
+                try {
+                    let response = await fetch(`/api/book/${bookId}`, {
+                        method: "PUT",
+                        headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
+                        body: formData
+                    });
+
+                    let result = await response.json();
+                    if (response.ok) {
+                        alert("Book updated successfully!");
+                        window.location.href = '/dashboard/book';
+                    } else {
+                        console.log(result);
+                        alert(`Error: ${result.message}`);
+                    }
+                } catch (error) {
+                    console.error("Error updating book:", error);
+                    alert("Something went wrong!");
+                }
+            });
+
+            document.getElementById('cancelBtn').addEventListener('click', function () {
+                //window.location.href = '/dashboard/book';
+            });
+        });
+    </script>
+</body>
+
+</html>

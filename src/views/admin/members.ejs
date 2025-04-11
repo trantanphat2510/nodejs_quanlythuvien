@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Management - Library Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <%- include("sideBar") %>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <!-- <%- include("header") %> -->
+
+            <!-- Content Area -->
+            <div class="content">
+                <div class="page-header">
+                    <h1>Members Management</h1>
+                    <p>Manage your library's members and their borrowing activities</p>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="action-bar">
+                    <div class="action-bar-left">
+                        <div class="search-container">
+                            <i class="fas fa-search"></i>
+                            <input type="search" placeholder="Search members by name, email, ID...">
+                        </div>
+                    </div>
+                    <div class="action-bar-right">
+                        <div class="dropdown">
+                            <button class="btn btn-outline dropdown-toggle">
+                                <i class="fas fa-filter"></i>
+                                <span>Filter</span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="#">All Members</a>
+                                <a href="#">Active Members</a>
+                                <a href="#">Inactive Members</a>
+                                <a href="#">With Overdue Books</a>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-download"></i>
+                            <span>Export</span>
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            <span>Add Member</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Members Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Library Members</h2>
+                        <p>View and manage all registered members</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Member</th>
+                                        <th>Member ID</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Status</th>
+                                        <th>Books Borrowed</th>
+                                        <th>Join Date</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="member-info">
+                                                <div class="member-avatar">
+                                                    <img src="https://via.placeholder.com/32" alt="John Doe">
+                                                </div>
+                                                <span class="font-medium">John Doe</span>
+                                            </div>
+                                        </td>
+                                        <td>LIB-001</td>
+                                        <td>john.doe@example.com</td>
+                                        <td>(555) 123-4567</td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>2</td>
+                                        <td>Jan 10, 2023</td>
+                                        <td class="text-right">
+                                            <div class="dropdown">
+                                                <button class="btn-icon dropdown-toggle">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <a href="#">View Profile</a>
+                                                    <a href="#">Edit Member</a>
+                                                    <a href="#">View Borrowing History</a>
+                                                    <a href="#">Send Reminder</a>
+                                                    <a href="#" class="text-danger">Deactivate Member</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="member-info">
+                                                <div class="member-avatar">
+                                                    <img src="https://via.placeholder.com/32" alt="Jane Smith">
+                                                </div>
+                                                <span class="font-medium">Jane Smith</span>
+                                            </div>
+                                        </td>
+                                        <td>LIB-002</td>
+                                        <td>jane.smith@example.com</td>
+                                        <td>(555) 234-5678</td>
+                                        <td><span class="badge badge-success">Active</span></td>
+                                        <td>1</td>
+                                        <td>Feb 15, 2023</td>
+                                        <td class="text-right">
+                                            <div class="dropdown">
+                                                <button class="btn-icon dropdown-toggle">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <a href="#">View Profile</a>
+                                                    <a href="#">Edit Member</a>
+                                                    <a href="#">View Borrowing History</a>
+                                                    <a href="#">Send Reminder</a>
+                                                    <a href="#" class="text-danger">Deactivate Member</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="member-info">
+                                                <div class="member-avatar">
+                                                    <img src="https://via.placeholder.com/32" alt="Robert Johnson">
+                                                </div>
+                                                <span class="font-medium">Robert Johnson</span>
+                                            </div>
+                                        </td>
+                                        <td>LIB-003</td>
+                                        <td>robert.johnson@example.com</td>
+                                        <td>(555) 345-6789</td>
+                                        <td><span class="badge badge-secondary">Inactive</span></td>
+                                        <td>0</td>
+                                        <td>Mar 5, 2023</td>
+                                        <td class="text-right">
+                                            <div class="dropdown">
+                                                <button class="btn-icon dropdown-toggle">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <a href="#">View Profile</a>
+                                                    <a href="#">Edit Member</a>
+                                                    <a href="#">View Borrowing History</a>
+                                                    <a href="#">Send Reminder</a>
+                                                    <a href="#" class="text-danger">Deactivate Member</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>

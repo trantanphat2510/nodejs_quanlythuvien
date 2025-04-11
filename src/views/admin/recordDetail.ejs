@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Management - Library Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- Font Awesome for icons -->
+    <style>
+        .record-detail-container {
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .record-info,
+        .user-info {
+            margin-bottom: 24px;
+            font-size: 16px;
+        }
+
+        .record-info div {
+            margin-bottom: 8px;
+        }
+
+        .book-list table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        .book-list th,
+        .book-list td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .book-list img {
+            max-height: 60px;
+            border-radius: 4px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <%- include("sideBar") %>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="record-detail-container">
+                    <button onclick="window.location.href='/dashboard/borrowings'" class="btn btn-primary">Quay lại</button>
+                    <h2>Chi tiết đơn mượn</h2>
+
+                    <div class="record-info">
+                        <div>
+                            <strong>Mã đơn:</strong> <span id="record-id"></span>
+                        </div>
+                        <div>
+                            <strong>Ngày mượn:</strong> <span id="borrow-date"></span>
+                        </div>
+                        <div>
+                            <strong>Ngày trả:</strong> <span id="return-date"></span>
+                        </div>
+                        <div>
+                            <strong>Trạng thái:</strong> <span id="status"></span>
+                        </div>
+                    </div>
+
+                    <div class="user-info">
+                        <h3>Thông tin người mượn</h3> <br />
+                        <p><strong>Họ tên:</strong> <span id="username"></span></p> <br />
+                        <p><strong>Email:</strong> <span id="email"></span></p>
+                    </div>
+
+                    <div class="book-list">
+                        <h3>Sách đã mượn</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ảnh</th>
+                                    <th>Tên sách</th>
+                                    <th>Tác giả</th>
+                                    <th>Nhà xuất bản</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>Tổng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="book-items">
+                                <!-- Dữ liệu sách sẽ được render ở đây -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+
+    </div>
+
+    <script src="/js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const pathSegments = window.location.pathname.split('/');
+            const id = pathSegments[pathSegments.length - 1];
+
+            if (!id || isNaN(id)) {
+                window.location.href = "/dashboard/borrowings";
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/borrowrecords/${id}`);
+                if (!res.ok) throw new Error();
+
+                const data = await res.json();
+
+                document.getElementById("record-id").textContent = data.RecordId;
+                document.getElementById("borrow-date").textContent = new Date(data.BorrowDate).toLocaleDateString();
+                document.getElementById("return-date").textContent = new Date(data.ReturnDate).toLocaleDateString();
+                document.getElementById("status").textContent = data.Status;
+
+                document.getElementById("username").textContent = data.User.Username;
+                document.getElementById("email").textContent = data.User.Email;
+
+                const tbody = document.getElementById("book-items");
+                tbody.innerHTML = "";
+
+                data.RecordDetails.forEach(detail => {
+                    const book = detail.Book;
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td><img src="/${book.Image}" alt="${book.Title}"></td>
+                        <td>${book.Title}</td>
+                        <td>${book.Author}</td>
+                        <td>${book.Publisher}</td>
+                        <td>${detail.Quantity}</td>
+                        <td>${book.Price.toLocaleString()}đ</td>
+                        <td>${detail.Price.toLocaleString()}đ</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Không thể tải dữ liệu", err);
+                window.location.href = "/dashboard/borrowings";
+            }
+        });
+    </script>
+
+</body>
+
+</html>

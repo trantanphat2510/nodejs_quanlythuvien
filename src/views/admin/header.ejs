@@ -1,0 +1,60 @@
+<header class="header">
+    <div class="header-left">
+        <button class="sidebar-toggle" id="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="search" placeholder="Search books, members...">
+        </div>
+    </div>
+    <div class="header-right">
+        <div class="user-dropdown">
+            <div class="user-dropdown-menu">
+                <button class="user-dropdown-toggle">
+                    <img src="https://www.refugee-action.org.uk/wp-content/uploads/2016/10/anonymous-user.png" alt=".">
+                </button>
+                <div class="user-dropdown-header">
+                    <span class="user-name" id="user-name-header">...</span>
+                    <span class="user-email" id="user-email-header">...</span>
+                </div>
+                <ul>
+                    <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#"><i class="fas fa-sign-out-alt"></i> Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+    //custom javascript
+    const token = localStorage.getItem("token");
+
+    fetch("/api/user/current", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.Role.RoleName.toLowerCase() === 'admin') {
+                document.getElementById('user-name-header').innerText = data.Username;
+                document.getElementById('user-email-header').innerText = data.Email;
+            } else {
+                window.location.replace("/");
+            }
+        })
+        .catch(error => {
+            // alert("Error fetching user data:", error);
+            window.location.href = '/login';
+        });
+</script>

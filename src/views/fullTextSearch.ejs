@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books - Libraria</title>
+    <link rel="stylesheet" href="/css/books.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i%7CLato:100,100i,300,300i,400,400i,700,700i,900,900i"
+        rel="stylesheet" />
+    <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        mark {
+            background-color: yellow;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+    </style>
+    <!-- Mobile Menu -->
+    <link href="/css/mmenu.css" rel="stylesheet" type="text/css" />
+    <link href="/css/mmenu.positioning.css" rel="stylesheet" type="text/css" />
+
+    <!-- Stylesheet -->
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <!-- Header -->
+
+    <!-- Hero Section -->
+    <section class="hero-section books-hero">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>Start typing to search</h1>
+                <p><a href="/books">Quay lại</a></p>
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <input type="text" id="search-input" placeholder="Search by title, author, or category...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="btn btn-primary search-btn">Search</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="books-section">
+        <div class="container">
+
+
+            <!-- Books Grid/List -->
+            <div id="books-container" class="books-grid">
+                <!-- Books will be dynamically inserted here by JavaScript -->
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <%- include("footer") %>
+        <!-- End: Footer -->
+
+        <script>
+            // Book data
+            let booksData = [];
+
+            const booksContainer = document.getElementById('books-container');
+
+            function fetchAndRenderBooks() {
+                fetch('/api/book')
+                    .then(res => res.json())
+                    .then(books => {
+                        console.log(books);
+                        booksData = books.map(book => ({
+                            id: book.BookId,
+                            title: book.Title,
+                            author: book.Author,
+                            coverImage: book.Image,
+                            category: book.Categories.map(c => c.CategoryName).join(', '),
+                            year: book.Year,
+                            available: book.Stock > 0,
+                            description: book.Title,
+                            fullContent: book.FullContent
+                        }));
+
+                        renderBooks(booksData);
+                    })
+                    .catch(error => console.error(error));
+            }
+
+            function renderBooks(books) {
+                booksContainer.innerHTML = '';
+
+                if (books.length === 0) {
+                    booksContainer.innerHTML = `
+            <div class="no-results">
+                <h3>No books found</h3>
+                <p>Try adding some books to the database</p>
+            </div>
+        `;
+                    return;
+                }
+
+                books.forEach(book => {
+                    booksContainer.appendChild(createBookCard(book));
+                });
+            }
+
+            // Create book card
+            function createBookCard(book) {
+                const bookCard = document.createElement('div');
+                bookCard.className = 'book-card';
+
+                bookCard.innerHTML = `
+        <div class="book-cover">
+            <img src="/${book.coverImage}" alt="${book.title}">
+            <div class="book-badge ${book.available ? 'badge-available' : 'badge-unavailable'}">
+                ${book.available ? 'Available' : 'Unavailable'}
+            </div>
+        </div>
+        <div class="book-details">
+            <div class="book-meta">
+                <span class="book-category">${book.category}</span>
+            </div>
+            <h3 class="book-title">${book.title}</h3>
+            <p class="book-author">by ${book.author}</p>
+            <p class="book-year">Published: ${book.year}</p>
+            <div class="book-actions">
+                <a href="/books/${book.id}" class="btn btn-outline">Details</a>
+                <button class="btn btn-primary" ${!book.available ? 'disabled' : ''}>
+                    ${book.available ? 'Borrow' : 'Reserve'}
+                </button>
+            </div>
+        </div>
+    `;
+                if (book.highlightSnippet) {
+                    bookCard.innerHTML += `
+        <div class="book-snippet">
+            <p>${book.highlightSnippet}</p>
+        </div>
+    `;
+                }
+                return bookCard;
+            }
+
+            document.addEventListener('DOMContentLoaded', fetchAndRenderBooks);
+
+            function highlightMatch(text, query) {
+                if (!query) return text;
+                const regex = new RegExp(`(${query})`, 'gi');
+                return text.replace(regex, '<mark>$1</mark>');
+            }
+
+            function filterBooks(query) {
+                const lowerQuery = query.toLowerCase();
+
+                return booksData
+                    .map(book => {
+                        const matched =
+                            book.title.toLowerCase().includes(lowerQuery) ||
+                            book.author.toLowerCase().includes(lowerQuery) ||
+                            book.category.toLowerCase().includes(lowerQuery) ||
+                            book.fullContent?.toLowerCase().includes(lowerQuery);
+
+                        if (!matched) return null;
+
+                        let snippet = '';
+                        const contentLower = book.fullContent?.toLowerCase();
+                        const index = contentLower?.indexOf(lowerQuery);
+
+                        if (index !== -1) {
+                            const start = Math.max(0, index - 30);
+                            const end = Math.min(book.fullContent.length, index + 70);
+                            snippet = book.fullContent.substring(start, end);
+                            snippet = highlightMatch(snippet, query);
+                        }
+
+                        return {
+                            ...book,
+                            highlightSnippet: snippet
+                        };
+                    })
+                    .filter(Boolean);
+            }
+            document.getElementById('search-input').addEventListener('input', function (e) {
+                const query = e.target.value.trim();
+                const filteredBooks = filterBooks(query);
+                renderBooks(filteredBooks);
+            });
+
+        </script>
+</body>
+
+</html>

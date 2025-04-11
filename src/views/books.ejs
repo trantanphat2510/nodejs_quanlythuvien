@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books - Libraria</title>
+    <link rel="stylesheet" href="/css/books.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i%7CLato:100,100i,300,300i,400,400i,700,700i,900,900i"
+        rel="stylesheet" />
+    <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Mobile Menu -->
+    <link href="/css/mmenu.css" rel="stylesheet" type="text/css" />
+    <link href="/css/mmenu.positioning.css" rel="stylesheet" type="text/css" />
+
+    <!-- Stylesheet -->
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <!-- Header -->
+    <%- include("header") %>
+
+    <div data-ride="carousel" class="carousel slide" id="home-v1-header-carousel" style="height: 600px;">
+
+        <!-- Carousel slides -->
+        <div class="carousel-inner" style="height: 600px;">
+            <div class="item active">
+                <figure>
+                    <img alt="Home Slide" src="images/header-slider/home-v1/header-slide.jpg" />
+                </figure>
+                <div class="container">
+                    <div class="carousel-caption">
+                        <h3>Online Learning Anytime, Anywhere!</h3>
+                        <h2>Discover Your Roots</h2>
+                        <p>There are many variations of passages of Lorem Ipsum available, but the majority have
+                            suffered alteration in some form, by injected humor, or randomized words.</p>
+                        <div class="slide-buttons hidden-sm hidden-xs">
+                            <a href="#" class="btn btn-primary">Read More</a>
+                            <a href="#" class="btn btn-default">Purchase</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <figure>
+                    <img alt="Home Slide" src="images/header-slider/home-v1/header-slide.jpg" />
+                </figure>
+                <div class="container">
+                    <div class="carousel-caption">
+                        <h3>Online Learning Anytime, Anywhere!</h3>
+                        <h2>Discover Your Roots</h2>
+                        <p>There are many variations of passages of Lorem Ipsum available, but the majority have
+                            suffered alteration in some form, by injected humor, or randomized words.</p>
+                        <div class="slide-buttons hidden-sm hidden-xs">
+                            <a href="#" class="btn btn-primary">Read More</a>
+                            <a href="#" class="btn btn-default">Purchase</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <figure>
+                    <img alt="Home Slide" src="images/header-slider/home-v1/header-slide.jpg" />
+                </figure>
+                <div class="container">
+                    <div class="carousel-caption">
+                        <h3>Online Learning Anytime, Anywhere!</h3>
+                        <h2>Discover Your Roots</h2>
+                        <p>There are many variations of passages of Lorem Ipsum available, but the majority have
+                            suffered alteration in some form, by injected humor, or randomized words.</p>
+                        <div class="slide-buttons hidden-sm hidden-xs">
+                            <a href="#" class="btn btn-primary">Read More</a>
+                            <a href="#" class="btn btn-default">Purchase</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <a class="left carousel-control" href="#home-v1-header-carousel" data-slide="prev"></a>
+        <a class="right carousel-control" href="#home-v1-header-carousel" data-slide="next"></a>
+    </div>
+    <!-- Hero Section -->
+    <section class="hero-section books-hero">
+        <div class="overlay"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>EXPLORE OUR BOOKS</h1>
+                <p>Bạn muốn tím kiếm nâng cao hơn nữa? Ấn vào <a href="/books/search">Đây</a></p>
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <input type="text" id="search-input" placeholder="Search by title, author, or category...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="btn btn-primary search-btn">Search</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="books-section">
+        <div class="container">
+            <!-- Filters and Sorting -->
+            <div class="books-controls">
+                <div class="filter-controls">
+                    <button id="filter-toggle" class="btn btn-outline">
+                        <i class="fas fa-filter"></i> Filters
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="results-count">
+                        Showing <span id="results-number">8</span> results
+                    </div>
+                </div>
+                
+                <div class="view-controls">
+                    <div class="sort-control">
+                        <label for="sort-select">Sort by:</label>
+                        <select id="sort-select">
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="a-z">Title (A-Z)</option>
+                            <option value="z-a">Title (Z-A)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="view-mode">
+                        <button id="grid-view" class="view-btn active">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button id="list-view" class="view-btn">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Panel (Collapsible) -->
+            <div id="filters-panel" class="filters-panel">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <h3>Categories</h3>
+                        <div class="filter-options" id="category-options">
+                            <!-- Categories -->
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <h3>Availability</h3>
+                        <div class="filter-options">
+                            <div class="filter-option">
+                                <input type="checkbox" id="available" class="availability-filter">
+                                <label for="available">Available Now</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="all-books" class="availability-filter">
+                                <label for="all-books">All Books</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <h3>Publication Year</h3>
+                        <div class="filter-options">
+                            <div class="filter-option">
+                                <input type="checkbox" id="year-2023" class="year-filter">
+                                <label for="year-2023">2023</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="year-2022" class="year-filter">
+                                <label for="year-2022">2022</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="year-2021" class="year-filter">
+                                <label for="year-2021">2021</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="year-2020" class="year-filter">
+                                <label for="year-2020">2020</label>
+                            </div>
+                            <div class="filter-option">
+                                <input type="checkbox" id="year-earlier" class="year-filter">
+                                <label for="year-earlier">Earlier</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="filter-actions">
+                    <button id="clear-filters" class="btn btn-outline">Clear All</button>
+                    <button id="apply-filters" class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+
+            <!-- Books Grid/List -->
+            <div id="books-container" class="books-grid">
+                <!-- Books will be dynamically inserted here by JavaScript -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button style="color: black;" class="pagination-btn">Previous</button>
+                <button style="color: black;" class="pagination-btn active">1</button>
+                <button style="color: black;" class="pagination-btn">2</button>
+                <button style="color: black;" class="pagination-btn">3</button>
+                <span style="color: black;" class="pagination-ellipsis">...</span>
+                <button style="color: black;" class="pagination-btn">10</button>
+                <button style="color: black;" class="pagination-btn">Next</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <%- include("footer") %>
+    <!-- End: Footer -->
+
+    <script src="/js/books.js"></script>
+</body>
+</html>

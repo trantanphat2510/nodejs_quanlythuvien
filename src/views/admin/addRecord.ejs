@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books Management - Library Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <%- include("sideBar") %>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Header -->
+                <!-- <%- include("header") %> -->
+
+                <!-- Content Area -->
+                <div class="content">
+                    <div class="page-header">
+                        <h1>Create new Borrowing</h1>
+                        <p>Tạo phiên mượn mới</p>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="action-bar">
+                        <div class="action-bar-left">
+                            <div class="search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="search" placeholder="Search books by title, author, ISBN...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Borrow Form -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Tạo Phiên Mượn Mới</h2>
+                        </div>
+                        <div class="card-content">
+                            <form id="borrow-form">
+                                <div class="form-group">
+                                    <label for="borrowDate">Số thẻ</label>
+                                    <input type="text" id="cardNumber" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="borrowDate">Ngày Mượn</label>
+                                    <input type="date" id="borrowDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="returnDate">Ngày Trả</label>
+                                    <input type="date" id="returnDate" required>
+                                </div>
+                                <button onclick="window.location.href='/dashboard/borrowings'" class="btn btn-danger">Trở về</button>
+                                <button type="submit" class="btn btn-primary">Tạo Phiên Mượn</button>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- Books Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Book Collection</h2>
+                            <p>Manage and view all books in your library</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Author</th>
+                                            <th>Image</th>
+                                            <th>Category</th>
+                                            <th>Stock</th>
+                                            <th>Released Year</th>
+                                            <th class="text-right">Mượn</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="book-table">
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+    </div>
+
+    <script src="/js/admin.js"></script>
+    <script>
+        let bookList = [];
+
+        const renderBook = () => {
+            fetch("/api/book", {
+                method: "GET",
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        alert(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(books => {
+                    bookList = books; 
+                    displayBooks(books);
+                })
+                .catch(error => console.error("Error fetching books:", error));
+        };
+
+        const displayBooks = (books) => {
+            const tableBody = document.getElementById("book-table");
+            tableBody.innerHTML = "";
+
+            books.forEach(book => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+            <td class="font-medium">${book.Title}</td>
+            <td>${book.Author}</td>
+            <td>
+                <img src="/${book.Image}" alt="Book Cover" style="width: 50px; height: auto; border-radius: 5px;">
+            </td>
+            <td>${book.Categories && book.Categories.length > 0
+                        ? book.Categories.map(c => c.CategoryName).join(", ")
+                        : "Unknown"}
+            </td>
+            <td>
+                <span class="badge ${book.Stock > 0 ? 'badge-success' : 'badge-danger'}">
+                    ${book.Stock > 0 ? book.Stock : 'Hết hàng'}
+                </span>
+            </td>
+            <td>${book.Year}</td>
+            <td class="text-right">
+                ${book.Stock > 0 ? `
+                    <input type="checkbox" class="book-checkbox" data-id="${book.BookId}" data-stock="${book.Stock}">
+                    <input type="number" class="quantity-input" data-id="${book.BookId}" min="1" max="${book.Stock}" placeholder="SL" style="width: 60px; display: none;">
+                ` : ''}
+            </td>
+        `;
+
+                tableBody.appendChild(row);
+            });
+
+            // Xử lý toggle input số lượng khi checkbox được chọn
+            document.querySelectorAll(".book-checkbox").forEach(checkbox => {
+                checkbox.addEventListener("change", function () {
+                    const bookId = this.getAttribute("data-id");
+                    const quantityInput = document.querySelector(`.quantity-input[data-id="${bookId}"]`);
+                    quantityInput.style.display = this.checked ? "inline-block" : "none";
+                });
+            });
+        };
+
+
+        const filterBooks = (searchTerm) => {
+            const filteredBooks = bookList.filter(book =>
+                book.Title.toLowerCase().includes(searchTerm) ||
+                book.Author.toLowerCase().includes(searchTerm) ||
+                (book.ISBN && book.ISBN.toLowerCase().includes(searchTerm))
+            );
+            displayBooks(filteredBooks);
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderBook();
+
+            document.querySelector(".search-container input").addEventListener("input", (event) => {
+                const searchTerm = event.target.value.toLowerCase();
+                filterBooks(searchTerm);
+            });
+
+            document.addEventListener("click", async (event) => {
+                if (event.target.classList.contains("delete-book")) {
+                    event.preventDefault();
+
+                    const bookId = event.target.getAttribute("data-id");
+                    if (!bookId) return;
+
+                    const confirmDelete = confirm("Bạn có chắc muốn xóa sách này?");
+                    if (!confirmDelete) return;
+
+                    try {
+                        const response = await fetch(`/api/book/${bookId}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": `Bearer ${localStorage.getItem("token")}`
+                            }
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            event.target.closest("tr").remove();
+                        } else {
+                            alert(`Lỗi: ${result.error || "Có lỗi xảy ra!"}`);
+                        }
+                    } catch (error) {
+                        alert("Lỗi kết nối đến server!");
+                        console.error("Delete Error:", error);
+                    }
+                }
+            });
+        });
+
+        document.getElementById("borrow-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const borrowDate = document.getElementById("borrowDate").value;
+            const returnDate = document.getElementById("returnDate").value;
+            const cardNumber = document.getElementById('cardNumber').value;
+
+            if (!borrowDate || !returnDate || new Date(borrowDate) >= new Date(returnDate)) {
+                return alert("Ngày mượn phải nhỏ hơn ngày trả.");
+            }
+
+            const selectedBooks = Array.from(document.querySelectorAll(".book-checkbox:checked"));
+            if (selectedBooks.length === 0) {
+                return alert("Vui lòng chọn ít nhất một cuốn sách.");
+            }
+
+            const arr = [];
+
+            for (let checkbox of selectedBooks) {
+                const bookId = parseInt(checkbox.getAttribute("data-id"));
+                const stock = parseInt(checkbox.getAttribute("data-stock"));
+                const quantityInput = document.querySelector(`.quantity-input[data-id="${bookId}"]`);
+                const quantity = parseInt(quantityInput.value);
+
+                if (!quantity || quantity < 1 || quantity > stock) {
+                    return alert(`Số lượng sách (ID: ${bookId}) không hợp lệ!`);
+                }
+
+                arr.push([bookId, quantity]);
+            }
+
+            const dataToSend = {
+                BorrowDate: new Date(borrowDate).toISOString(),
+                ReturnDate: new Date(returnDate).toISOString(),
+                CardNumber: cardNumber,
+                Status: "BORROWING",
+                Arr: arr
+            };
+
+            // Gửi về backend
+            fetch("/api/borrowrecords", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify(dataToSend)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert("Lỗi: " + data.error);
+                    } else {
+                        alert("Tạo phiếu mượn thành công!");
+                        // reset lại form và reload sách
+                        document.getElementById("borrow-form").reset();
+                        renderBook();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Đã xảy ra lỗi khi gửi dữ liệu.");
+                });
+        });
+
+    </script>
+
+</body>
+
+</html>

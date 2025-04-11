@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books - Libraria</title>
+    <link rel="stylesheet" href="/css/books.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i%7CLato:100,100i,300,300i,400,400i,700,700i,900,900i"
+        rel="stylesheet" />
+    <link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <style>
+        #cart-container {
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+
+        .cart-item img {
+            margin-right: 10px;
+        }
+    </style>
+
+    <!-- Mobile Menu -->
+    <link href="/css/mmenu.css" rel="stylesheet" type="text/css" />
+    <link href="/css/mmenu.positioning.css" rel="stylesheet" type="text/css" />
+
+    <!-- Stylesheet -->
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <!-- Header -->
+    <%- include("header") %>
+
+        <div data-ride="carousel" class="carousel slide" id="home-v1-header-carousel" style="height: 600px;">
+
+            <!-- Carousel slides -->
+            <div class="carousel-inner" style="height: 600px;">
+                <div class="item active">
+                    <figure>
+                        <img alt="Home Slide" src="images/header-slider/home-v1/header-slide.jpg" />
+                    </figure>
+                    <div class="container">
+                        <div class="carousel-caption">
+                            <h3>Online Learning Anytime, Anywhere!</h3>
+                            <h2>Discover Your Roots</h2>
+                            <p>There are many variations of passages of Lorem Ipsum available, but the majority have
+                                suffered alteration in some form, by injected humor, or randomized words.</p>
+                            <div class="slide-buttons hidden-sm hidden-xs">
+                                <a href="#" class="btn btn-primary">Read More</a>
+                                <a href="#" class="btn btn-default">Purchase</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <figure>
+                        <img alt="Home Slide" src="images/header-slider/home-v1/header-slide.jpg" />
+                    </figure>
+                    <div class="container">
+                        <div class="carousel-caption">
+                            <h3>Online Learning Anytime, Anywhere!</h3>
+                            <h2>Discover Your Roots</h2>
+                            <p>There are many variations of passages of Lorem Ipsum available, but the majority have
+                                suffered alteration in some form, by injected humor, or randomized words.</p>
+                            <div class="slide-buttons hidden-sm hidden-xs">
+                                <a href="#" class="btn btn-primary">Read More</a>
+                                <a href="#" class="btn btn-default">Purchase</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <figure>
+                        <img alt="Home Slide" src="images/header-slider/home-v1/header-slide.jpg" />
+                    </figure>
+                    <div class="container">
+                        <div class="carousel-caption">
+                            <h3>Online Learning Anytime, Anywhere!</h3>
+                            <h2>Discover Your Roots</h2>
+                            <p>There are many variations of passages of Lorem Ipsum available, but the majority have
+                                suffered alteration in some form, by injected humor, or randomized words.</p>
+                            <div class="slide-buttons hidden-sm hidden-xs">
+                                <a href="#" class="btn btn-primary">Read More</a>
+                                <a href="#" class="btn btn-default">Purchase</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="cart-container" class="container">
+                <h2>Giỏ mượn sách</h2>
+                <div id="cart-items"></div>
+                <div id="cart-controls" style="margin-top: 20px;">
+                    <label>Ngày nhận: <input type="date" id="borrow-date"></label> <br/>
+                    <label>Ngày trả: <input type="date" id="return-date"></label> <br/>
+                    <label>Số thẻ: <input type="text" disabled id="card-number"></label> <br/>
+                    <button id="submit-cart" class="btn btn-primary">Gửi yêu cầu mượn</button> <br/>
+                    <button id="clear-cart" class="btn btn-danger">Xóa tất cả</button> <br/>
+                    <button onclick="window.location.href = '/'" class="btn btn-primary">Trang chủ</button>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <a class="left carousel-control" href="#home-v1-header-carousel" data-slide="prev"></a>
+            <a class="right carousel-control" href="#home-v1-header-carousel" data-slide="next"></a>
+        </div>
+
+        <!-- Footer -->
+        <!-- End: Footer -->
+        <script>
+            let booksData = [];
+            let cart = {};
+
+            fetch("/api/user/current", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                }
+            })
+                .then(res => {
+                    if (res.status != 200) {
+                        window.location.href = '/login';
+                        return null;
+                    } else {
+                        return res.json();
+                    }
+                })
+                .then(user => {
+                    if (user) {
+                        document.getElementById('card-number').value = `${user.CardNumber}`;
+                    }
+                })
+                .catch(() => window.location.href = '/login');
+
+            // Load cart từ localStorage nếu có
+            function loadCartFromStorage() {
+                const stored = localStorage.getItem('cart');
+                if (stored) {
+                    try {
+                        const parsed = JSON.parse(stored);
+                        if (Array.isArray(parsed)) {
+                            cart = {};
+                            parsed.forEach(([id, qty]) => {
+                                cart[id] = qty;
+                            });
+                        }
+                    } catch (e) {
+                        console.error("Lỗi khi parse localStorage cart:", e);
+                    }
+                }
+            }
+
+            // Lưu cart vào localStorage
+            function saveCartToStorage() {
+                const arr = Object.entries(cart).map(([id, qty]) => [parseInt(id), qty]);
+                localStorage.setItem('cart', JSON.stringify(arr));
+            }
+
+            // Hiển thị giỏ hàng
+            function renderCart() {
+                const cartContainer = document.getElementById('cart-items');
+                cartContainer.innerHTML = '';
+
+                Object.entries(cart).forEach(([id, quantity]) => {
+                    const book = booksData.find(b => b.id == id);
+                    if (!book) return;
+
+                    const item = document.createElement('div');
+                    item.className = 'cart-item';
+                    item.innerHTML = `
+                            <img src="${book.coverImage}" alt="${book.title}" width="50" />
+                            <div style="flex: 1; margin-left: 10px;">
+                                <strong>${book.title}</strong> - Tác giả: ${book.author} (${book.year})<br>
+                                <small>Thể loại: ${book.category}</small><br>
+                                <button onclick="updateQuantity(${book.id}, -1)">-</button>
+                                <span style="margin: 0 10px;">${quantity}</span>
+                                <button onclick="updateQuantity(${book.id}, 1)">+</button>
+                                <button onclick="removeFromCart(${book.id})" class="btn btn-sm btn-danger">Xóa</button>
+                            </div>
+                        `;
+                    cartContainer.appendChild(item);
+                });
+
+                saveCartToStorage();
+            }
+
+            function updateQuantity(bookId, change) {
+                const book = booksData.find(b => b.id == bookId);
+                if (!book) return;
+
+                cart[bookId] = (cart[bookId] || 0) + change;
+
+                if (cart[bookId] <= 0) {
+                    delete cart[bookId];
+                } else if (cart[bookId] > book.available) {
+                    cart[bookId] = book.available;
+                    alert("Số lượng vượt quá tồn kho!");
+                }
+
+                renderCart();
+            }
+
+            function removeFromCart(bookId) {
+                delete cart[bookId];
+                renderCart();
+            }
+
+            function clearCart() {
+                cart = {};
+                renderCart();
+            }
+
+            // Gửi mượn sách
+            function submitCart() {
+                const borrowDate = document.getElementById('borrow-date').value;
+                const returnDate = document.getElementById('return-date').value;
+
+                if (!borrowDate || !returnDate) {
+                    alert("Vui lòng chọn ngày mượn và trả!");
+                    return;
+                }
+
+                const payload = {
+                    BorrowDate: new Date(borrowDate).toISOString(),
+                    ReturnDate: new Date(returnDate).toISOString(),
+                    CardNumber: document.getElementById('card-number').value,
+                    Status: "PENDING",
+                    Arr: Object.entries(cart).map(([id, qty]) => [parseInt(id), qty])
+                };
+
+                if (payload.Arr.length === 0) {
+                    alert("Giỏ sách trống!");
+                    return;
+                }
+
+                fetch('/api/borrowrecords', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': localStorage.getItem('token') },
+                    body: JSON.stringify(payload)
+                })
+                    .then(res => {
+                        return res.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        if (data.error != undefined) {
+                            throw new Error(data.error);
+                        }
+                        alert("Gửi yêu cầu mượn thành công!");
+                        clearCart();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert(err);
+                    });
+            }
+
+            document.getElementById('clear-cart').addEventListener('click', clearCart);
+            document.getElementById('submit-cart').addEventListener('click', submitCart);
+
+            fetch('/api/book')
+                .then(res => res.json())
+                .then(books => {
+                    booksData = books.map(book => ({
+                        id: book.BookId,
+                        title: book.Title,
+                        author: book.Author,
+                        coverImage: book.Image,
+                        category: book.Categories.map(c => c.CategoryName).join(', '),
+                        year: book.Year,
+                        available: book.Stock,
+                        description: book.Description
+                    }));
+                    loadCartFromStorage();
+                    renderCart();
+                })
+                .catch(err => {
+                    console.error("Lỗi khi fetch danh sách sách:", err);
+                });
+        </script>
+
+
+
+</body>
+
+</html>

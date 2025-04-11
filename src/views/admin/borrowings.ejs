@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Management - Library Admin</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <%- include("sideBar") %>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <!-- <%- include("header") %> -->
+
+            <!-- Content Area -->
+            <div class="content">
+                <div class="page-header">
+                    <h1>Borrowings Management</h1>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="action-bar">
+                    <div class="action-bar-right">
+                        <button class="btn btn-primary" onclick="window.location.href = '/dashboard/borrowings/add'">
+                            <i class="fas fa-plus"></i>
+                            <span>Create a Direct Borrowing</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Members Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Chờ duyệt</h2>
+                        <p>Những đơn hàng đang chờ được mượn</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Borrow Date</th>
+                                        <th>Return Date</th>
+                                        <th>Status</th>
+                                        <th>Total Price</th>
+                                        <th>User</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="PENDING-records">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Members Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Đang Mượn</h2>
+                        <p>Những đơn hàng đang được mượn</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Borrow Date</th>
+                                        <th>Return Date</th>
+                                        <th>Status</th>
+                                        <th>Total Price</th>
+                                        <th>User</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="BORROWING-records">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Members Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Hoàn thành</h2>
+                        <p>Những đơn hàng đã được hoàn thành</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Borrow Date</th>
+                                        <th>Return Date</th>
+                                        <th>Status</th>
+                                        <th>Total Price</th>
+                                        <th>User</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="DONE-records">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/borrowings.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

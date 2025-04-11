@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management Dashboard</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <%- include("sideBar") %>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <!-- <%- include("header") %> -->
+
+            <!-- Content Area -->
+            <div class="content">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <p>Welcome back, manage your library efficiently.</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stats-card">
+                        <div class="stats-card-header">
+                            <h3>Total Books</h3>
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stats-card-content">
+                            <div class="stats-value">3,246</div>
+                            <p class="stats-description">+12 added today</p>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-card-header">
+                            <h3>Active Members</h3>
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-card-content">
+                            <div class="stats-value">1,832</div>
+                            <p class="stats-description">+5 new members</p>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-card-header">
+                            <h3>Books Borrowed</h3>
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="stats-card-content">
+                            <div class="stats-value">482</div>
+                            <p class="stats-description">32 due this week</p>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-card-header">
+                            <h3>Overdue Books</h3>
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stats-card-content">
+                            <div class="stats-value">24</div>
+                            <p class="stats-description">Send reminders</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities and Popular Books -->
+                <div class="dashboard-grid">
+                    <div class="card recent-activities">
+                        <div class="card-header">
+                            <h2>Recent Activities</h2>
+                            <p>Latest transactions in your library</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="activity-item">
+                                <div class="activity-details">
+                                    <span class="activity-title">Book Borrowed</span>
+                                    <span class="activity-subtitle">John Doe - The Great Gatsby</span>
+                                </div>
+                                <span class="activity-time">2 hours ago</span>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-details">
+                                    <span class="activity-title">Book Returned</span>
+                                    <span class="activity-subtitle">Jane Smith - To Kill a Mockingbird</span>
+                                </div>
+                                <span class="activity-time">3 hours ago</span>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-details">
+                                    <span class="activity-title">New Member</span>
+                                    <span class="activity-subtitle">Robert Johnson</span>
+                                </div>
+                                <span class="activity-time">5 hours ago</span>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-details">
+                                    <span class="activity-title">Book Added</span>
+                                    <span class="activity-subtitle">Admin - The Catcher in the Rye</span>
+                                </div>
+                                <span class="activity-time">1 day ago</span>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-details">
+                                    <span class="activity-title">Book Borrowed</span>
+                                    <span class="activity-subtitle">Emily Davis - 1984</span>
+                                </div>
+                                <span class="activity-time">1 day ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card popular-books">
+                        <div class="card-header">
+                            <h2>Popular Books</h2>
+                            <p>Most borrowed books this month</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="book-item">
+                                <div class="book-details">
+                                    <span class="book-title">To Kill a Mockingbird</span>
+                                    <span class="book-author">Harper Lee</span>
+                                </div>
+                                <div class="book-borrows">42 borrows</div>
+                            </div>
+                            <div class="book-item">
+                                <div class="book-details">
+                                    <span class="book-title">1984</span>
+                                    <span class="book-author">George Orwell</span>
+                                </div>
+                                <div class="book-borrows">38 borrows</div>
+                            </div>
+                            <div class="book-item">
+                                <div class="book-details">
+                                    <span class="book-title">The Great Gatsby</span>
+                                    <span class="book-author">F. Scott Fitzgerald</span>
+                                </div>
+                                <div class="book-borrows">35 borrows</div>
+                            </div>
+                            <div class="book-item">
+                                <div class="book-details">
+                                    <span class="book-title">Pride and Prejudice</span>
+                                    <span class="book-author">Jane Austen</span>
+                                </div>
+                                <div class="book-borrows">30 borrows</div>
+                            </div>
+                            <div class="book-item">
+                                <div class="book-details">
+                                    <span class="book-title">The Catcher in the Rye</span>
+                                    <span class="book-author">J.D. Salinger</span>
+                                </div>
+                                <div class="book-borrows">28 borrows</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/admin.js"></script>
+    
+</body>
+
+</html>

@@ -1,0 +1,93 @@
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fas fa-book-open"></i>
+            <span>LibraryAdmin</span>
+        </div>
+        <button class="sidebar-close" id="sidebar-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="sidebar-content">
+        <div class="sidebar-group">
+            <h3 class="sidebar-group-title">Main Menu</h3>
+            <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                    <a href="/dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="/dashboard/book">
+                        <i class="fas fa-book"></i>
+                        <span>Books</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="/dashboard/penalties">
+                        <i class="fas fa-users"></i>
+                        <span>Penalties</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="/dashboard/borrowings">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Borrowings</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="/dashboard/categories">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Categories</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="/">
+                        <i class="fas fa-home"></i>
+                        <span>Homepage</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="sidebar-footer">
+        <div class="user-info">
+            <div class="user-details">
+                <span class="user-name" id="user-name">..</span>
+                <span class="user-email" id="user-email">..</span>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<script>
+    //custom javascript
+    const token = localStorage.getItem("token");
+
+    fetch("/api/user/current", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.Role.RoleName.toLowerCase() === 'admin') {
+                document.getElementById('user-name').innerText = data.Username;
+                document.getElementById('user-email').innerText = data.Email;
+            } else {
+                window.location.replace("/");
+            }
+        })
+        .catch(error => {
+            alert("Error fetching user data:", error);
+            window.location.href = '/login';
+        });
+</script>

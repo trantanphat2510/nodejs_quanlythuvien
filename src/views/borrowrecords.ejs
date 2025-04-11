@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrowed Books - Libraria</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/library-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 100px 20px;
+        }
+        
+        .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #ff7043;
+        }
+        
+        .hero-section p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .main-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .main-content p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .search-container {
+            display: flex;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        
+        .search-container input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        
+        .search-container button {
+            background-color: #ff7043;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            cursor: pointer;
+            border-radius: 0 4px 4px 0;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+        
+        .filter-sort {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .filter-button {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .filter-button svg {
+            margin-right: 5px;
+        }
+        
+        .sort-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .sort-container span {
+            margin-right: 10px;
+            color: #555;
+        }
+        
+        .sort-container select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .view-buttons {
+            display: flex;
+            gap: 5px;
+            margin-left: 15px;
+        }
+        
+        .view-button {
+            width: 30px;
+            height: 30px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        
+        .view-button.active {
+            background-color: #ddd;
+        }
+        
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .book-card {
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            transition: transform 0.3s;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .book-image {
+            height: 250px;
+            background-color: #f9f9f9;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .book-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .availability {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .available {
+            background-color: #4CAF50;
+        }
+        
+        .unavailable {
+            background-color: #f44336;
+        }
+        
+        .book-info {
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .book-category {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .book-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .book-author {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .book-published {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .book-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 8px 0;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        
+        .btn-details {
+            background-color: #f0f0f0;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-borrow {
+            background-color: #ff7043;
+            color: white;
+            border: none;
+        }
+        
+        .btn-reserve {
+            background-color: #ff7043;
+            color: white;
+            border: none;
+        }
+        
+        .btn-return {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #777;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .empty-state p {
+            margin-bottom: 20px;
+        }
+        
+        .empty-state .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 50px 20px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .footer-section p {
+            color: #bbb;
+            line-height: 1.6;
+        }
+        
+        .footer-links a {
+            display: block;
+            color: #bbb;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #ff7043;
+        }
+        
+        .footer-links a svg {
+            margin-right: 5px;
+        }
+        
+        .library-hours {
+            margin-bottom: 10px;
+            color: #bbb;
+        }
+        
+        .footer-links.horizontal {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .footer-links.horizontal a {
+            margin-bottom: 0;
+        }
+        
+        .contact-info {
+            display: flex;
+            align-items: center;
+            color: #bbb;
+            margin-bottom: 10px;
+        }
+        
+        .contact-info svg {
+            margin-right: 10px;
+            min-width: 20px;
+        }
+        
+        .twitter-feed {
+            background-color: #222;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .twitter-feed a {
+            color: #ff7043;
+            text-decoration: none;
+        }
+        
+        .borrow-date {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .due-date {
+            color: #ff7043;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .no-books {
+            text-align: center;
+            padding: 50px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <h1>DISCOVER YOUR ROOTS</h1>
+        <p>Online Learning Anytime, Anywhere!</p>
+    </div>
+    
+    <div class="main-content">
+        <h2>YOUR BORROWED BOOKS</h2>
+        <p>Track and manage all your borrowed books in one place</p>
+        
+        <div class="search-container">
+            <input type="text" placeholder="Search by title, author, or category...">
+            <button>SEARCH</button>
+        </div>
+        
+        <div class="filter-sort">
+            <button class="filter-button">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M15 3H1l5.5 6.5V14l3-1.5V9.5L15 3z"></path>
+                </svg>
+                FILTERS
+            </button>
+            
+            <div class="sort-container">
+                <span>Sort by:</span>
+                <select>
+                    <option>Borrow Date (Newest)</option>
+                    <option>Borrow Date (Oldest)</option>
+                    <option>Due Date (Soonest)</option>
+                    <option>Title (A-Z)</option>
+                    <option>Author (A-Z)</option>
+                </select>
+                
+                <div class="view-buttons">
+                    <button class="view-button active"></button>
+                    <button class="view-button"></button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="borrowed-books-container" class="books-grid">
+            <!-- Borrowed books will be displayed here -->
+            <div class="no-books" id="no-books-message">
+                <h3>You haven't borrowed any books yet</h3>
+                <p>Go to the homepage and browse our collection to borrow books</p>
+                <a href="/" class="btn btn-borrow">Browse Books</a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>ABOUT LIBRARIA</h3>
+                <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking.</p>
+                <div class="contact-info">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm.7 13.6H6.9v-1.8h1.8v1.8zm0-3.6H6.9V4.5h1.8v5.5z"></path>
+                    </svg>
+                    21 King Street, Melbourne, Victoria 3000 Australia
+                </div>
+                <div class="contact-info">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M13.5 1h-11C1.7 1 1 1.7 1 2.5v11c0 .8.7 1.5 1.5 1.5h11c.8 0 1.5-.7 1.5-1.5v-11c0-.8-.7-1.5-1.5-1.5zm0 13h-11V2.5h11V14z"></path>
+                        <path d="M3 4h10v1H3zM3 7h10v1H3zM3 10h5v1H3z"></path>
+                    </svg>
+                    support@libraria.com
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>QUICK LINKS</h3>
+                <div class="footer-links">
+                    <a href="#">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 8l-5 5L4 11.5 7.5 8 4 4.5 5.5 3l5 5z"></path>
+                        </svg>
+                        Library News
+                    </a>
+                    <a href="#">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 8l-5 5L4 11.5 7.5 8 4 4.5 5.5 3l5 5z"></path>
+                        </svg>
+                        History
+                    </a>
+                    <a href="#">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 8l-5 5L4 11.5 7.5 8 4 4.5 5.5 3l5 5z"></path>
+                        </svg>
+                        Meet Our Staff
+                    </a>
+                    <a href="#">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 8l-5 5L4 11.5 7.5 8 4 4.5 5.5 3l5 5z"></path>
+                        </svg>
+                        Board of Trustees
+                    </a>
+                    <a href="#">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 8l-5 5L4 11.5 7.5 8 4 4.5 5.5 3l5 5z"></path>
+                        </svg>
+                        Budget
+                    </a>
+                    <a href="#">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M10.5 8l-5 5L4 11.5 7.5 8 4 4.5 5.5 3l5 5z"></path>
+                        </svg>
+                        Annual Report
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>TIMING</h3>
+                <div class="library-hours">Mon - Thu: 9 am - 9 pm</div>
+                <div class="library-hours">Fri: 9 am - 6 pm</div>
+                <div class="library-hours">Sat: 9 am - 5 pm</div>
+                <div class="library-hours">Sun: 1 pm - 6 pm</div>
+                <div class="footer-links horizontal">
+                    <a href="#">Closings</a> | <a href="#">Branches</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>LATEST TWEETS</h3>
+                <div class="twitter-feed">
+                    <a href="#">@TemplateLibraria</a> Sed ut perspiciatis unde omnis iste natus error sit voluptatem. <a href="#">template-libraria.com</a>
+                </div>
+                <div class="twitter-feed">
+                    <a href="#">@TemplateLibraria</a> Sed ut perspiciatis unde omnis iste natus error sit voluptatem. <a href="#">template-libraria.com</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    loadBorrowedBooks();
+});
+
+function loadBorrowedBooks() {
+    const borrowedBooks = JSON.parse(localStorage.getItem('borrowedBooks')) || [];
+    const container = document.getElementById('borrowed-books-container');
+    const noBookMessage = document.getElementById('no-books-message');
+
+    // Clear container
+    container.innerHTML = '';
+
+    if (borrowedBooks.length === 0) {
+        noBookMessage.style.display = 'block';
+        return;
+    } else {
+        noBookMessage.style.display = 'none';
+    }
+
+    borrowedBooks.forEach(book => {
+        const borrowDate = new Date(book.borrowDate);
+        // Calculate due date (14 days from borrow date)
+        const dueDate = new Date(borrowDate);
+        dueDate.setDate(dueDate.getDate() + 14);
+
+        const bookCard = document.createElement('div');
+        bookCard.className = 'book-card';
+        bookCard.innerHTML = `
+            <div class="book-image">
+                <img src="${book.coverImage}" alt="${book.title}">
+                <div class="availability available">Available</div>
+            </div>
+            <div class="book-info">
+                <div class="book-category">${book.category}</div>
+                <div class="book-title">${book.title}</div>
+                <div class="book-author">by ${book.author}</div>
+                <div class="book-published">Published: ${book.year}</div>
+                <div class="borrow-date">Borrowed: ${borrowDate.toLocaleDateString()}</div>
+                <div class="due-date">Due: ${dueDate.toLocaleDateString()}</div>
+                <div class="book-actions">
+                    <div class="btn btn-details">DETAILS</div>
+                    <div class="btn btn-return" data-id="${book.id}" onclick="returnBook('${book.id}')">RETURN</div>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(bookCard);
+    });
+}
+
+function returnBook(bookId) {
+    let borrowedBooks = JSON.parse(localStorage.getItem('borrowedBooks')) || [];
+    borrowedBooks = borrowedBooks.filter(book => book.id !== bookId);
+    localStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+
+    loadBorrowedBooks();
+
+    alert('Book has been returned successfully!');
+}
+    </script>
+
+    <!-- <script>
+        // Function to load borrowed books from localStorage
+        function loadBorrowedBooks() {
+            const borrowedBooks = JSON.parse(localStorage.getItem('borrowedBooks')) || [];
+            const container = document.getElementById('borrowed-books-container');
+            const noBookMessage = document.getElementById('no-books-message');
+            
+            // Clear container except for the no-books message
+            const elements = container.querySelectorAll('.book-card');
+            elements.forEach(el => el.remove());
+            
+            // Show or hide no books message
+            if (borrowedBooks.length === 0) {
+                noBookMessage.style.display = 'block';
+                return;
+            } else {
+                noBookMessage.style.display = 'none';
+            }
+            
+            // Add each borrowed book to the container
+            borrowedBooks.forEach(book => {
+                const borrowDate = new Date(book.borrowDate);
+                // Calculate due date (14 days from borrow date)
+                const dueDate = new Date(borrowDate);
+                dueDate.setDate(dueDate.getDate() + 14);
+                
+                const bookCard = document.createElement('div');
+                bookCard.className = 'book-card';
+                bookCard.innerHTML = `
+                    <div class="book-image">
+                        <img src="${book.image}" alt="${book.title}">
+                        <div class="availability available">Available</div>
+                    </div>
+                    <div class="book-info">
+                        <div class="book-category">${book.category}</div>
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">by ${book.author}</div>
+                        <div class="book-published">Published: ${book.published}</div>
+                        <div class="borrow-date">Borrowed: ${borrowDate.toLocaleDateString()}</div>
+                        <div class="due-date">Due: ${dueDate.toLocaleDateString()}</div>
+                        <div class="book-actions">
+                            <div class="btn btn-details">DETAILS</div>
+                            <div class="btn btn-return" data-id="${book.id}">RETURN</div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(bookCard);
+                
+                // Add event listener to return button
+                const returnBtn = bookCard.querySelector('.btn-return');
+                returnBtn.addEventListener('click', function() {
+                    returnBook(book.id);
+                });
+            });
+        }
+        
+        // Function to return a book
+        function returnBook(bookId) {
+            let borrowedBooks = JSON.parse(localStorage.getItem('borrowedBooks')) || [];
+            borrowedBooks = borrowedBooks.filter(book => book.id !== bookId);
+            localStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+            
+            // Reload the books display
+            loadBorrowedBooks();
+            
+            // Show success message
+            alert('Book has been returned successfully!');
+        }
+        
+        // Load books when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBorrowedBooks();
+            
+            // Add event listener to search input
+            const searchInput = document.querySelector('.search-container input');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const bookCards = document.querySelectorAll('.book-card');
+                
+                bookCards.forEach(card => {
+                    const title = card.querySelector('.book-title').textContent.toLowerCase();
+                    const author = card.querySelector('.book-author').textContent.toLowerCase();
+                    const category = card.querySelector('.book-category').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || author.includes(searchTerm) || category.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Add event listener to search button
+            const searchButton = document.querySelector('.search-container button');
+            searchButton.addEventListener('click', function() {
+                const searchTerm = document.querySelector('.search-container input').value.toLowerCase();
+                const bookCards = document.querySelectorAll('.book-card');
+                
+                bookCards.forEach(card => {
+                    const title = card.querySelector('.book-title').textContent.toLowerCase();
+                    const author = card.querySelector('.book-author').textContent.toLowerCase();
+                    const category = card.querySelector('.book-category').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || author.includes(searchTerm) || category.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Add event listener to sort dropdown
+            const sortSelect = document.querySelector('.sort-container select');
+            sortSelect.addEventListener('change', function() {
+                const sortOption = this.value;
+                const borrowedBooks = JSON.parse(localStorage.getItem('borrowedBooks')) || [];
+                
+                // Sort books based on selected option
+                if (sortOption === 'Borrow Date (Newest)') {
+                    borrowedBooks.sort((a, b) => new Date(b.borrowDate) - new Date(a.borrowDate));
+                } else if (sortOption === 'Borrow Date (Oldest)') {
+                    borrowedBooks.sort((a, b) => new Date(a.borrowDate) - new Date(b.borrowDate));
+                } else if (sortOption === 'Due Date (Soonest)') {
+                    borrowedBooks.sort((a, b) => {
+                        const aDueDate = new Date(a.borrowDate);
+                        aDueDate.setDate(aDueDate.getDate() + 14);
+                        const bDueDate = new Date(b.borrowDate);
+                        bDueDate.setDate(bDueDate.getDate() + 14);
+                        return aDueDate - bDueDate;
+                    });
+                } else if (sortOption === 'Title (A-Z)') {
+                    borrowedBooks.sort((a, b) => a.title.localeCompare(b.title));
+                } else if (sortOption === 'Author (A-Z)') {
+                    borrowedBooks.sort((a, b) => a.author.localeCompare(b.author));
+                }
+                
+                localStorage.setItem('borrowedBooks', JSON.stringify(borrowedBooks));
+                loadBorrowedBooks();
+            });
+        });
+    </script> -->
+</body>
+</html>
