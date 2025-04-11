@@ -9,10 +9,10 @@ const session = require('express-session');
 
 
 app.use(session({
-  secret: 'your_secret_key',   
+  secret: 'your_secret_key',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } 
+  cookie: { secure: false }
 }));
 
 configViewEngine(app);
