@@ -1,11 +1,15 @@
 {
-  "development": 
-  {
-    "username": "root",
-    "password": "",
+  "development": {
+    "username": "avnadmin",
+    "password": "AVNS_DJ6H35YRlBm-De43LaG",
     "database": "librarydb",
-    "host": "104.28.237.72",
+    "host": "quanlythuvien-trantanphat25100110-5494.b.aivencloud.com",
     "dialect": "mysql",
-    "port": 3306
+    "port": 13777,
+    "dialectOptions": {
+      "ssl": {
+        "rejectUnauthorized": false
+      }
+    }
   }
 }
